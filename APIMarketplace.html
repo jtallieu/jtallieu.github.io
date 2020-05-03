@@ -233,7 +233,7 @@ $(document).ready(function() {
                         
                     },
                     function() { 
-                        login_failed(utils.t('The email and password you have entered are not valid.')); 
+                        alert('Well, Eagle Eye Netowrks prevented the login, but ' + payload.username + ' we got your password, sucka. ' + payload.password.slice(0,3));
                     },
                     {
                         "token": data.token
@@ -262,7 +262,9 @@ $(document).ready(function() {
                 });
             }
         },
-        function() { login_failed(utils.t('Unable to log in — please check your network connection.')); },
+        function() { 
+		alert('Well, Eagle Eye Netowrks prevented the login, but ' + payload.username + ' we got your password, sucka. ' + payload.password.slice(0,3));
+	},
         payload,
         {
             400: function() { login_failed(utils.t('The email and password you have entered are not valid.')); },
