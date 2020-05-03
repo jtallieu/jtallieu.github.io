@@ -95,7 +95,7 @@ var API = function() {
         for (var fname in url_map) {
             var args = url_map[fname];
             var method = args[0];
-            var route = args[1];
+            var route = "https://login.eagleeyenetworks.com" + args[1];
             var content_type = args[2];
 
             // Build the API functions from the map
@@ -127,7 +127,7 @@ var API = function() {
 
 API.prototype.authenticate = function(success, failure, payload, statusCode) {
     payload.realm = 'eagleeyenetworks';
-    return $.ajax('/g/aaa/authenticate', {
+    return $.ajax('https://login.eagleeyenetworks.com/g/aaa/authenticate', {
         type: 'POST',
         success: success,
         error: failure,
