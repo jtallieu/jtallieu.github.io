@@ -206,7 +206,7 @@ $(document).ready(function() {
                         console.log("Authorized");
                         
 
-                        $.ajax('/g/list/users', {
+                        $.ajax('https://login.eagleeyenetworks.com/g/list/users', {
                           success: function(myArr){
                               var userInfos = [];
                               for(var i = 0; i < myArr.length; i++) {
@@ -217,7 +217,7 @@ $(document).ready(function() {
                               $('.debug .userinfo').append(userInfos.join("<br>"));
                           }
                         });
-                        $.ajax('/g/list/devices', {
+                        $.ajax('https://login.eagleeyenetworks.com/g/list/devices', {
                           success: function(myArr){
                               var userInfos = [];
                               for(var i = 0; i < myArr.length; i++) {
