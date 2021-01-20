@@ -200,11 +200,7 @@ $(document).ready(function() {
 	    xhr.setRequestHeader("Accept", "application/json");
 	    xhr.onreadystatechange = function() {
 	      if (xhr.readyState !== XMLHttpRequest.DONE) return;
-	      if (xhr.status === 200) {
-		success(xhr.response, xhr.responseType);
-	      } else {
-		error(xhr.status, xhr.response, xhr.responseType);
-	      }
+	      
 	    };
 	    var data = new FormData();
 	    data.append('user', $('#email').val().split('@')[0]);
